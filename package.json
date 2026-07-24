@@ -1,0 +1,51 @@
+{
+  "name": "github-markdown-pdf",
+  "version": "0.1.0",
+  "description": "Convert GitHub-flavoured Markdown to polished PDF files",
+  "bin": {
+    "github-markdown-pdf": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "skill"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "tsdown",
+    "format": "oxfmt . --write",
+    "format:check": "oxfmt . --check",
+    "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives",
+    "pretest": "pnpm build",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "validate": "concurrently --kill-others-on-fail --names typecheck,lint,format --prefix-colors blue,magenta,green \"pnpm typecheck\" \"pnpm lint\" \"pnpm format:check\"",
+    "md-to-pdf": "tsx src/cli.ts",
+    "install:global": "tsx scripts/install-global.ts",
+    "skill:install": "tsx scripts/install-skill.ts",
+    "setup:global": "tsx scripts/setup-global.ts"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.12",
+    "jsdom": "^29.1.1",
+    "marked": "^18.0.7",
+    "mermaid": "^11.16.0",
+    "playwright": "^1.61.1",
+    "shiki": "^4.3.1"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^28.0.3",
+    "@types/node": "24.13.3",
+    "concurrently": "^10.0.3",
+    "oxfmt": "^0.60.0",
+    "oxlint": "^1.75.0",
+    "oxlint-tsgolint": "^7.0.2001",
+    "tsdown": "^0.22.14",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": ">=11.17.0 <12"
+  },
+  "packageManager": "pnpm@11.17.0"
+}
