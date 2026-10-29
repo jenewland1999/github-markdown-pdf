@@ -5,7 +5,12 @@ import { tmpdir } from "node:os";
 import { delimiter, join } from "node:path";
 import test from "node:test";
 
-import { convertMarkdownToPdf, defaultOutputPath, sanitizeHtml } from "../src/converter.js";
+import {
+  applyAlerts,
+  convertMarkdownToPdf,
+  defaultOutputPath,
+  sanitizeHtml,
+} from "../src/converter.js";
 
 test("default output replaces Markdown extension", () => {
   assert.equal(defaultOutputPath("docs/readme.markdown"), "docs/readme.pdf");
@@ -20,6 +25,18 @@ test("sanitizer preserves renderer markup and removes executable HTML", () => {
   assert.match(sanitized, /<svg viewBox="0 0 10 10">/);
   assert.match(sanitized, /class="shiki"/);
   assert.match(sanitized, /type="checkbox"/);
+});
+
+test("alerts preserve lists and multiple paragraphs", () => {
+  const rendered = applyAlerts(
+    "<blockquote><p>[!IMPORTANT]\nFirst paragraph</p><p>Second paragraph</p><ul><li>One</li><li>Two</li></ul></blockquote>",
+  );
+
+  assert.match(rendered, /class="markdown-alert markdown-alert-important"/);
+  assert.match(rendered, /class="markdown-alert-title">Important<\/p>/);
+  assert.doesNotMatch(rendered, /\[!IMPORTANT\]/);
+  assert.match(rendered, /<p>First paragraph<\/p><p>Second paragraph<\/p><ul>/);
+  assert.match(rendered, /<li>One<\/li><li>Two<\/li>/);
 });
 
 test("comprehensive fixture converts to non-empty PDF", { timeout: 60_000 }, async () => {

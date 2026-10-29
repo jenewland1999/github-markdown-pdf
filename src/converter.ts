@@ -2,12 +2,12 @@ import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 import { marked, Renderer } from "marked";
 import { readFile, mkdir, stat } from "node:fs/promises";
-import { createRequire } from "node:module";
 import { dirname, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 import { createHighlighter } from "shiki";
 
+import { renderDiagrams } from "./diagrams.js";
 import { STYLES } from "./styles.js";
 
 const SUPPORTED_EXTENSIONS = new Set([".md", ".markdown"]);
@@ -32,12 +32,41 @@ function escapeHtml(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-function applyAlerts(html: string): string {
-  return html.replace(
-    /<blockquote>\s*<p>\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(?:<br>)?([\s\S]*?)<\/p>\s*<\/blockquote>/gi,
-    (_, type: string, body: string) =>
-      `<div class="markdown-alert markdown-alert-${type.toLowerCase()}"><p class="markdown-alert-title">${type[0]}${type.slice(1).toLowerCase()}</p><p>${body.trim()}</p></div>`,
-  );
+export function applyAlerts(html: string): string {
+  const dom = new JSDOM(`<body>${html}</body>`);
+  try {
+    const { document } = dom.window;
+    const blockquotes = [...document.querySelectorAll("blockquote")];
+
+    for (const blockquote of blockquotes) {
+      const firstParagraph = blockquote.firstElementChild;
+      if (firstParagraph?.tagName.toLowerCase() !== "p") continue;
+
+      const match = firstParagraph.textContent?.match(
+        /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i,
+      );
+      if (!match) continue;
+
+      firstParagraph.innerHTML = firstParagraph.innerHTML.replace(
+        /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(?:<br\s*\/?>)?/i,
+        "",
+      );
+
+      const type = match[1]!.toLowerCase();
+      const alert = document.createElement("div");
+      alert.className = `markdown-alert markdown-alert-${type}`;
+
+      const title = document.createElement("p");
+      title.className = "markdown-alert-title";
+      title.textContent = `${type[0]!.toUpperCase()}${type.slice(1)}`;
+      alert.append(title, ...Array.from(blockquote.childNodes));
+      blockquote.replaceWith(alert);
+    }
+
+    return document.body.innerHTML;
+  } finally {
+    dom.window.close();
+  }
 }
 
 const IMAGE_TYPES: Record<string, string> = {
@@ -101,21 +130,16 @@ export async function convertMarkdownToPdf(
   const body = sanitizeHtml(renderedBody);
   highlighter.dispose();
 
-  const require = createRequire(import.meta.url);
-  const mermaidPath = require.resolve("mermaid/dist/mermaid.min.js");
-  const mermaidScript = await readFile(mermaidPath, "utf8");
   const base = pathToFileURL(`${dirname(input)}/`).href;
-  const html = `<!doctype html><html><head><meta charset="utf-8"><base href="${base}"><style>${STYLES}</style></head><body><main class="markdown-body">${body}</main><script>${mermaidScript}</script><script>mermaid.initialize({startOnLoad:false,theme:'default'});</script></body></html>`;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><base href="${base}"><style>${STYLES}</style></head><body><main class="markdown-body">${body}</main></body></html>`;
 
   await mkdir(dirname(output), { recursive: true });
   const browser = await chromium.launch({ headless: true });
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "load" });
-    await page.evaluate(async () => {
-      await document.fonts.ready;
-      await mermaid.run({ querySelector: ".mermaid" });
-    });
+    await page.evaluate(async () => document.fonts.ready);
+    await renderDiagrams(page);
     await page.pdf({
       path: output,
       format: "A4",
@@ -131,8 +155,4 @@ export async function convertMarkdownToPdf(
     await browser.close();
   }
   return output;
-}
-
-declare global {
-  const mermaid: { run(options: { querySelector: string }): Promise<void> };
 }

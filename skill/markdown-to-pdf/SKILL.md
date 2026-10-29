@@ -1,6 +1,7 @@
 ---
 name: markdown-to-pdf
-description: Convert Markdown files, README files, and GitHub-flavoured Markdown documents into polished GitHub-style PDF files using the installed github-markdown-pdf command. Use whenever the user asks to convert, export, render, print, or save a Markdown or .md file as a PDF. Also use for requests such as "convert this file into a PDF" when the referenced file is Markdown. Do not use for converting Word documents, arbitrary HTML pages, images, or existing PDF files.
+description: Convert Markdown files into polished GitHub-style PDFs using the installed github-markdown-pdf command.
+disable-model-invocation: true
 compatibility: Requires Node.js, the github-markdown-pdf executable, and its installed Playwright Chromium browser.
 ---
 

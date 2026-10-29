@@ -1,6 +1,8 @@
 # github-markdown-pdf
 
-Convert GitHub-flavoured Markdown into polished A4 PDFs using Marked, Shiki `github-light-default`, Mermaid, and Playwright Chromium.
+Convert GitHub-flavoured Markdown into polished A4 PDFs using Marked, Shiki `github-light-default`, Pele for Mermaid diagrams, and Playwright Chromium.
+
+Mermaid diagrams are rendered locally using Pele's layout and visual style. Pele targets Mermaid 12.1.0 syntax, so some diagram features may render differently from Mermaid.js. Invalid or unsupported diagrams stop conversion with an error.
 
 Requires Node.js 24 and PNPM 11.17.0.
 
