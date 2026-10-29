@@ -27,6 +27,17 @@ test("sanitizer preserves renderer markup and removes executable HTML", () => {
   assert.match(sanitized, /type="checkbox"/);
 });
 
+test("sanitizer removes executable content from malformed HTML and SVG", () => {
+  const sanitized = sanitizeHtml(
+    '<div><img src="x" onerror="alert(1)"><svg onload="alert(1)"><a href="javascript:alert(1)"><text>diagram</text></a><script>alert(1)</script></svg><p>Unclosed',
+  );
+
+  assert.doesNotMatch(sanitized, /onerror|onload|javascript:|<script/i);
+  assert.match(sanitized, /<svg/);
+  assert.match(sanitized, /diagram/);
+  assert.match(sanitized, /<p>Unclosed<\/p>/);
+});
+
 test("alerts preserve lists and multiple paragraphs", () => {
   const rendered = applyAlerts(
     "<blockquote><p>[!IMPORTANT]\nFirst paragraph</p><p>Second paragraph</p><ul><li>One</li><li>Two</li></ul></blockquote>",

@@ -25,27 +25,27 @@
     "setup:global": "tsx scripts/setup-global.ts"
   },
   "dependencies": {
-    "dompurify": "^3.4.12",
-    "jsdom": "^29.1.1",
-    "marked": "^18.0.7",
+    "dompurify": "^3.4.17",
+    "jsdom": "^30.1.3",
+    "marked": "^18.1.2",
     "pele": "^1.12.0",
-    "playwright": "^1.61.1",
-    "shiki": "^4.3.1"
+    "playwright": "^1.64.1",
+    "shiki": "^4.5.0"
   },
   "devDependencies": {
-    "@types/jsdom": "^28.0.3",
-    "@types/node": "24.13.3",
-    "concurrently": "^10.0.3",
-    "oxfmt": "^0.60.0",
-    "oxlint": "^1.75.0",
-    "oxlint-tsgolint": "^7.0.2001",
-    "tsdown": "^0.22.14",
-    "tsx": "^4.23.1",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "26.6.5",
+    "concurrently": "^10.0.6",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
+    "oxlint-tsgolint": "^7.0.2005",
+    "tsdown": "0.23.3",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   },
   "engines": {
-    "node": ">=24 <25",
-    "pnpm": ">=11.17.0 <12"
+    "node": ">=26.13.0 <27",
+    "pnpm": ">=12.16.1 <13"
   },
-  "packageManager": "pnpm@11.17.0"
+  "packageManager": "pnpm@12.16.1"
 }

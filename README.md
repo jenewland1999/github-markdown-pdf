@@ -4,7 +4,8 @@ Convert GitHub-flavoured Markdown into polished A4 PDFs using Marked, Shiki `git
 
 Mermaid diagrams are rendered locally using Pele's layout and visual style. Pele targets Mermaid 12.1.0 syntax, so some diagram features may render differently from Mermaid.js. Invalid or unsupported diagrams stop conversion with an error.
 
-Requires Node.js 24 and PNPM 11.17.0.
+Requires Node.js 26.13.0 LTS or later within Node 26, and PNPM 12.16.1.
+Node.js 26 does not include Corepack, so install PNPM using its [installation guide](https://pnpm.io/installation) or install Corepack separately.
 
 ## Development
 
@@ -23,7 +24,7 @@ Install or link from local checkout:
 pnpm install:global
 ```
 
-PNPM 11 uses `pnpm add --global <checkout-path>` internally.
+The installer uses `pnpm add --global <checkout-path>` internally.
 
 Use from any working directory:
 
